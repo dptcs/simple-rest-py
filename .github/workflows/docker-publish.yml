@@ -78,6 +78,7 @@ jobs:
       - name: Test
         run: |
           docker run -d -p 81:80 --rm --name flask ${{ steps.meta.outputs.tags }}
+          sleep 10
           curl --write-out '%{http_code}'  --silent --output /dev/null --request GET --url 'http://localhost:81'
           docker rm -f flask
           
