@@ -7,6 +7,7 @@ env:
   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   TERRAFORM_HTTP_CREDENTIALS: github.com/dptcs=foo:${{ secrets.PAT_GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
 
 on:
   workflow_dispatch:
@@ -27,7 +28,7 @@ jobs:
         id: checkov
         uses: bridgecrewio/checkov-action@master
         with:
-          directory: ${{ env.TERRAFORM_BASE_PATH }}}
+          directory: ${{ env.TERRAFORM_BASE_PATH }}
           soft_fail: true
 
   plan:
@@ -54,7 +55,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3.1.0
-      - name: terraform plan
+      - name: terraform apply
         uses: dflook/terraform-apply@v1.25.1
         with:
           auto_approve: true
