@@ -9,10 +9,16 @@ on:
   workflow_dispatch:
   push:
     branches: [ "main" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    paths:
+      - 'Dockerfile'
+      - 'helloworld.py'
+      - 'wsgi.py'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'Dockerfile'
+      - 'helloworld.py'
+      - 'wsgi.py'
 
 env:
   # Use docker.io for Docker Hub if empty
