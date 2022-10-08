@@ -78,7 +78,13 @@ jobs:
       - name: Test
         run: |
           docker run -d -p 81:80 --rm --name flask ${{ steps.meta.outputs.tags }}
-          curl -f -LI  http://localhost:81
+          CODE=`curl --write-out '%{http_code}'  --silent --output /dev/null --request GET --url 'http://localhost:81'`
+          if [ $CODE!="200" ] 
+          then
+            echo "FAILURE"
+          else
+            echo "SUCCESS"
+          fi
           docker rm -f flask
           
 
