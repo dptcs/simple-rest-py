@@ -129,6 +129,8 @@ jobs:
           subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
       - name: Deploy App
         run: |
-          echo ${{needs.build.outputs.tag}}
-          az vm run-command create --name "docker_run_3" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "docker run -d -p 80:80 --name flask2 ghcr.io/dptcs/simple-rest-py:sha-7eb4d22@sha256:234b6c9cb1991de16264581bf32a2fea213e47f19d83b3ffa776e48a55b61dd7"
-          az vm run-command show --name "docker_run_3" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
+          set -x
+          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "[ "$(docker ps --no-trunc -aq)" ] && docker rm -f `docker ps --no-trunc -aq`"
+          az vm run-command create --name "docker_run" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "docker run -d -p 80:80 --name flask ${{needs.build.outputs.tag}}"
+          az vm run-command show --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
+          az vm run-command show --name "docker_run" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
