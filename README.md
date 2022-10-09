@@ -4,7 +4,7 @@
 
 Run [Bootstrap TF Backend Config](https://github.com/dptcs/simple-rest-py/actions/workflows/bootstrap-backend-config.yml) to create an Azure Storage account and a blob container to store terraform state files.
 The GHA will set the necessary configuration for the next steps as well.
-> :note: Run it only from a clean slate otherwise it will create another storage account as this run is not storing its state.
+> :warning: Run it only from a clean slate otherwise it will create another storage account as this run is not storing its state.
 
 ## Provision the infrastructure
 
@@ -18,4 +18,4 @@ Run [Build Publish Deploy](https://github.com/dptcs/simple-rest-py/actions/workf
 
 Once you are done with the experiments, run [Nuke It](https://github.com/dptcs/simple-rest-py/actions/workflows/nuclear.yml) to clean all the resources in the subscription without any questions asked.
 
-> :note: This is an irreversible destructive activity. Do it with caution.
+> :warning: This is an irreversible destructive activity. Do it with caution.
