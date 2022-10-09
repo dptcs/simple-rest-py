@@ -1,9 +1,10 @@
 name: Docker
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+env:
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
 
 on:
   workflow_dispatch:
@@ -26,10 +27,12 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -37,7 +40,8 @@ jobs:
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
-
+    outputs:
+      tag: ${{ steps.meta.outputs.tags }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -114,3 +118,21 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+
+
+  deploy_app:
+    runs-on: ubuntu-latest
+    name: Show RGs
+    needs: [build]
+    steps:
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+      - name: Deploy App
+        run: |
+          echo ${{needs.build.outputs.tag}}
+          az vm run-command create --name "docker_run_3" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "docker run -d -p 80:80 --name flask2 ghcr.io/dptcs/simple-rest-py:sha-7eb4d22@sha256:234b6c9cb1991de16264581bf32a2fea213e47f19d83b3ffa776e48a55b61dd7"
+          az vm run-command show --name "docker_run_3" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
