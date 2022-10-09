@@ -11,6 +11,14 @@ env:
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'infra/terraform-vm/**'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'infra/terraform-vm/**'
 
 jobs:
   lint:

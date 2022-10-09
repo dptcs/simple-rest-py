@@ -13,10 +13,17 @@ terraform {
       source  = "hashicorp/tls"
       version = "4.0.3"
     }
+    github = {
+      source  = "integrations/github"
+      version = "5.3.0"
+    }
   }
 }
 
 # Configure the Microsoft Azure Provider
 provider "azurerm" {
   features {}
+}
+
+provider "github" {
 }
