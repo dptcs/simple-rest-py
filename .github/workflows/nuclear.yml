@@ -29,8 +29,6 @@ jobs:
           sleep 30
   delete_rgs:
     needs: [show_rgs]
-    environment:
-      name: god
     runs-on: ubuntu-latest
     name: Delete RGs
     steps:
