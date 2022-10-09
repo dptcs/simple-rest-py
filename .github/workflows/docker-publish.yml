@@ -98,7 +98,7 @@ jobs:
       - name: Deploy App
         run: |
           set -x
-          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group ${{ env.VM_RG }} --script "docker rm -f flask"
-          az vm run-command create --name "docker_run" --vm-name "myVM" --resource-group ${{ env.VM_RG }} --script "docker run -d -p 80:80 --name flask ${{needs.build.outputs.tag}}"
+          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group ${{ env.VM_RG }} --script "docker rm -f flask" --timeout-in-seconds 10 --debug
+          az vm run-command create --name "docker_run" --vm-name "myVM" --resource-group ${{ env.VM_RG }} --script "docker run -d -p 80:80 --name flask ${{needs.build.outputs.tag}}" --timeout-in-seconds 10 --debug
           az vm run-command show --name "remove_all_containers" --vm-name "myVM" --resource-group ${{ env.VM_RG }} --expand instanceView
           az vm run-command show --name "docker_run" --vm-name "myVM" --resource-group ${{ env.VM_RG }} --expand instanceView
