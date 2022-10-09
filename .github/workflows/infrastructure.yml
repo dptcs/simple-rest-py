@@ -1,0 +1,59 @@
+name: Infrastructure
+
+env:
+  TERRAFORM_BASE_PATH: "infra/terraform-vm"
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  TERRAFORM_HTTP_CREDENTIALS: github.com/dptcs=foo:${{ secrets.PAT_GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Validate terraform configuration
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+      - name: terraform fmt
+        uses: dflook/terraform-fmt-check@v1.27.0
+        with:
+          path: ${{ env.TERRAFORM_BASE_PATH }}
+      - name: Run Checkov action
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ${{ env.TERRAFORM_BASE_PATH }}
+          soft_fail: true
+
+  plan:
+    needs: ["lint"]
+    runs-on: ubuntu-latest
+    name: Plan  Infrastructure
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+      - name: terraform plan
+        uses: dflook/terraform-plan@v1.25.1
+        with:
+          path: ${{ env.TERRAFORM_BASE_PATH }}
+          backend_config: ${{ secrets.BACKEND_CONFIG }}
+  
+  apply:
+    needs: ["plan"]
+    runs-on: ubuntu-latest
+    name: Apply Infrastructure
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.1.0
+      - name: terraform apply
+        uses: dflook/terraform-apply@v1.25.1
+        with:
+          auto_approve: true
+          path: ${{ env.TERRAFORM_BASE_PATH }}
+          backend_config: ${{ secrets.BACKEND_CONFIG }}
