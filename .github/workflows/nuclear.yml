@@ -1,0 +1,49 @@
+name: Nuke It
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID_BCTEST99 }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID_BCTEST99 }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+on:
+  workflow_dispatch:
+
+permissions:
+      id-token: write
+      contents: read
+      
+jobs:
+  show_rgs:
+    runs-on: ubuntu-latest
+    name: Show RGs
+    steps:
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+      - name: List Resource Groups
+        run: |
+          az group list --query "[].name" -o tsv
+          sleep 30
+  delete_rgs:
+    needs: [show_rgs]
+    environment:
+      name: god
+    runs-on: ubuntu-latest
+    name: Delete RGs
+    steps:
+      - name: 'Az CLI login'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+      - name: Delete Resource Groups
+        run: |
+          for rgname in `az group list --query "[].name" -o tsv`; do               
+            echo Deleting ${rgname}
+            az group delete -n ${rgname} --yes --no-wait
+          done
+          
