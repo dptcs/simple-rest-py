@@ -1,4 +1,4 @@
-name: Docker
+name: Build Publish Deploy
 
 env:
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-
+      contents: read
     outputs:
       tag: ${{ steps.meta.outputs.tags }}
     steps:
