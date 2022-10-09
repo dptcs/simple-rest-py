@@ -9,3 +9,14 @@ resource "github_actions_secret" "vm_rg" {
   #checkov:skip=CKV_GIT_4: "Ensure Secrets are encrypted"
   plaintext_value = module.vm.resource_group_name
 }
+
+resource "github_repository_file" "foo" {
+  repository          = var.github_repo_name
+  branch              = "main"
+  file                = "vm_ip.md"
+  content             = "http://${module.vm.public_ip_address}"
+  commit_message      = "chore: new vm IP"
+  commit_author       = "dptcs"
+  commit_email        = "Deepak.Sisupalan@mnscorp.net"
+  overwrite_on_create = true
+}
