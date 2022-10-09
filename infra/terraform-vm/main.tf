@@ -4,8 +4,8 @@ module "vm" {
 }
 
 resource "github_actions_secret" "vm_rg" {
-  repository      = var.github_repo_name
-  secret_name     = "VM_RG"
+  repository  = var.github_repo_name
+  secret_name = "VM_RG"
   #checkov:skip=CKV_GIT_4: "Ensure Secrets are encrypted"
   plaintext_value = module.vm.resource_group_name
 }
