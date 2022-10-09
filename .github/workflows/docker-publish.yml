@@ -130,7 +130,7 @@ jobs:
       - name: Deploy App
         run: |
           set -x
-          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "[ \"$(docker ps --no-trunc -aq)\" ] && docker rm -f \`docker ps --no-trunc -aq\`"
+          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "docker rm -f \`docker ps --no-trunc -aq\`"
           az vm run-command create --name "docker_run" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "docker run -d -p 80:80 --name flask ${{needs.build.outputs.tag}}"
           az vm run-command show --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
           az vm run-command show --name "docker_run" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
