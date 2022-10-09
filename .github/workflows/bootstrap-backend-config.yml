@@ -4,13 +4,17 @@ env:
   TERRAFORM_BASE_PATH: "infra/terraform-state"
   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
   TERRAFORM_HTTP_CREDENTIALS: github.com/dptcs=foo:${{ secrets.PAT_GITHUB_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
+  ARM_USE_OIDC: true
 
 on:
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   lint:
