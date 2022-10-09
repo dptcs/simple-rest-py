@@ -113,12 +113,12 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+        run: echo "${{ steps.meta.outputs.tags }}" | xarg\s -I {} cosign sign {}@${{ s\teps.build-and-push.outputs.digest }}
 
 
   deploy_app:
     runs-on: ubuntu-latest
-    name: Show RGs
+    name: Deploy App
     needs: [build]
     steps:
       - name: 'Az CLI login'
@@ -130,7 +130,7 @@ jobs:
       - name: Deploy App
         run: |
           set -x
-          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "[ "$(docker ps --no-trunc -aq)" ] && docker rm -f `docker ps --no-trunc -aq`"
+          az vm run-command create --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "[ \"$(docker ps --no-trunc -aq)\" ] && docker rm -f \`docker ps --no-trunc -aq\`"
           az vm run-command create --name "docker_run" --vm-name "myVM" --resource-group "app-singular-sturgeon" --script "docker run -d -p 80:80 --name flask ${{needs.build.outputs.tag}}"
           az vm run-command show --name "remove_all_containers" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
           az vm run-command show --name "docker_run" --vm-name "myVM" --resource-group "app-singular-sturgeon" --expand instanceView
